@@ -31,8 +31,18 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
 add_executable(utf8_test
   main.c
   test.c
-  test.cpp
 )
+
+add_executable(utf8_test_cpp14
+    test.cpp
+    )
+set_target_properties(utf8_test_cpp14 PROPERTIES CXX_STANDARD 14)
+
+add_executable(utf8_test_cpp20
+    test.cpp
+    )
+set_target_properties(utf8_test_cpp20 PROPERTIES CXX_STANDARD 20)
+
 
 if("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
   set_source_files_properties(test.c test.cpp PROPERTIES
@@ -40,12 +50,17 @@ if("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
   )
 elseif("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
   set_source_files_properties(test.c test.cpp PROPERTIES
-    COMPILE_FLAGS "-Wall -Wextra -Weverything -Werror"
+    COMPILE_FLAGS "-Wall -Wextra -Weverything -Werror -Wno-c++98-compat"
   )
 elseif("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC")
   set_source_files_properties(test.c test.cpp PROPERTIES
     COMPILE_FLAGS "/Wall /WX /wd4514"
   )
+  if(${MSVC_VERSION} VERSION_GREATER "15.7")
+    set_source_files_properties(test.c test.cpp PROPERTIES
+        COMPILE_FLAGS "/Zc:__cplusplus"
+        )
+  endif()
 else()
   message(WARNING "Unknown compiler '${CMAKE_C_COMPILER_ID}'!")
 endif()
